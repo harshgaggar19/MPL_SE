@@ -1,0 +1,47 @@
+;ALP to accept a string and display its length
+
+section .bss
+	string resb 50
+	result resb 50
+	
+section .text
+global _start
+_start:
+	mov rax,0
+	mov rdi,0
+	mov rsi,string
+	mov rdx,50
+	syscall
+
+	mov rbx,0 ;clear base register
+	mov rbx,rax
+	mov rdi,result
+	mov cx,16
+
+	
+	M1:
+		ROL RBX,04
+		mov AL,BL
+		AND AL,0FH
+		CMP AL,09
+		JG M2
+		ADD AL,30H
+		JMP M3
+	M2:
+		ADD Al,37H
+	M3:
+		MOV [RDI],AL
+		INC RDI
+		DEC CX
+		JNZ M1
+		
+	mov rax,1
+	mov rdi,1
+	mov rsi,result
+	mov rdx,20
+	syscall
+	
+	mov rax,60
+	mov rdi,0
+	syscall
+		
