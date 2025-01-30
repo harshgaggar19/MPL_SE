@@ -1,0 +1,56 @@
+;ALP to accept and print 5 hexadecimal numbers
+section .data
+	m1 db "-------Accept five hexadecimal numbers:----- ",10,13
+	l1 equ $-m1
+	m2 db "-------Print five hexadecimal numbers: --------",10,13
+	l2 equ $-m2
+section .bss
+	array resb 85 ; more also works
+	counter resb 2
+section .text
+global _start
+_start:
+	mov rax,1
+	mov rdi,1
+	mov rsi,m1
+	mov rdx,l1
+	syscall ;write m1
+	
+	mov byte[counter],05
+	mov rbx,0
+	
+accept:
+	mov rax,0
+	mov rdi,0
+	mov rsi,array
+	add rsi,rbx
+	mov rdx,17
+	syscall ;read array
+	add rbx,17
+	dec byte[counter]
+	jnz accept
+	
+	mov rax,1
+	mov rdi,1
+	mov rsi,m2
+	mov rdx,l2
+	syscall ;write m2
+	
+	mov byte[counter],05
+	mov rbx,0
+	
+display:
+	mov rax,1
+	mov rdi,1
+	mov rsi,array
+	add rsi,rbx
+	mov rdx,17
+	syscall ;read array
+	add rbx,17
+	dec byte[counter]
+	jnz display
+	
+	mov rax,60
+	mov rdi,0
+	syscall ;exit
+	
