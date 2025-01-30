@@ -1,0 +1,89 @@
+; Assembly language program to find out the largest number from byte /word/ double word/ quad word /array and display the output
+
+section .data
+	array db 10H,23H,07H,77H,59H
+	m1 db "-------Array numbers are:----- ",10,13
+	l1 equ $-m1
+	m2 db "-------Print largest number: --------",10,13
+	l2 equ $-m2
+	
+	%macro rw 04
+	mov rax,%1
+	mov rdi,%2
+	mov rsi,%3
+	mov rdx,%4
+	syscall
+	%endmacro
+	
+section .bss
+	counter resb 02
+	result resb 04
+	
+section .text
+global _start
+_start:
+
+	;print 1st msg 
+	rw 1,1,m1,l1
+	
+	mov byte[counter],05
+	mov rsi,array
+	
+	S1: 
+		mov al,[rsi]
+		push rsi
+	
+	call disp
+		pop rsi
+		inc rsi
+		dec byte[counter]
+		jnz S1
+		
+	rw 1,1,m2,l2 ;print second msg
+		
+	mov byte[counter],05
+	mov rsi,array
+	mov al,0
+	
+	P1: 
+		cmp al,[rsi]
+		jg P2
+		mov al,[rsi]
+		
+	P2:
+		inc rsi
+		dec byte[counter]
+		jnz P1
+		
+	call disp
+	
+	mov rax,60
+	mov rdi,0
+	syscall ;exit
+	
+	disp: 
+		mov rbx,0
+		mov bl,al
+		mov rdi,result
+		mov cx,02
+		
+	Z1:
+		ROL bl,04
+		mov AL,BL
+		AND AL,0FH
+		CMP AL,09
+		JG Z2
+		ADD AL,30H
+		JMP Z3
+	Z2:
+		ADD Al,37H
+	Z3:
+		MOV [RDI],AL
+		INC RDI
+		DEC CX
+		JNZ Z1
+
+	
+	rw 1,1,result,02
+	ret
+	
