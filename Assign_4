@@ -1,0 +1,200 @@
+;incomplete
+
+
+
+;write the assembly lang program using the switch case to perform 64 bit hexadecimal arithmetic operation(+,-,*,/) usign the suitable macro
+;defne the procedure for each operation 
+
+ 
+;macro for read and write operations
+%macro rw 04
+mov rax,%1
+mov rdi,%2
+mov rsi,%3
+mov rdx,%4
+syscall
+%endmacro
+
+section .data
+	m1 db "-------Enter your choice:-----",10,13,"MENU",10,13,"Addition",10,13,"Substraction",10,13,"Multiplication",10,13,"Division",10,13,"Quotient",10,13,"Remainder",10,13
+	l1 equ $-m1
+	m2 db "-------Enter your choice: --------",10,13
+	l2 equ $-m2
+	m3 db "-------Result: --------",10,13
+	l3 equ $-m3
+	
+	
+section .bss
+	n1 resq 1
+	n2 resq 1
+	temp1 resq 1
+	temp2 resq 1
+	result resq 1
+	choice resb 2
+	
+section .text
+global _start
+_start:
+
+	;print menu msg
+	rw 1,1,m1,l1
+	
+	;print enter your choice msg
+	rw 1,1,m2,l2
+	
+	;read input(choice) 
+	rw 0,0,choice,2
+
+case1:
+	cmp byte[choice],'+'
+	jne case2
+	call add_fun
+	jmp exit
+	
+case2: 	
+	cmp byte[choice],'-'
+	jne case3
+	call sub_fun
+	jmp exit
+	
+case3: 	
+	cmp byte[choice],'*'
+	jne case4
+	call mul_fun
+	jmp exit
+	
+case4: 	
+	cmp byte[choice],'/'
+	jne case5
+	call div_fun
+	jmp exit
+	
+case5: 	
+	cmp byte[choice],'a'
+	jne error
+	call add_fun
+	call sub_fun
+	call mul_fun
+	call div_fun
+	jmp exit
+	
+error: 
+	rw 1,1,m2,l2
+	;rw 0,0,choice,2
+	;jmp case1
+	jmp exit
+	
+	
+exit:
+	mov rax,60
+	mov rdi,0
+	syscall ;exit
+	
+add_fun:
+
+    mov qword[result],0
+    rw 0, 0, n1, 17
+    call a_t_h
+    add qword[result],rbx
+    rw 0, 0, n1, 17
+    call a_t_h
+    add qword[result],rbx
+    mov rbx,[result]
+    rw 1, 1, m3, l3 
+    call h_t_a
+    ret
+	
+	
+sub_fun:
+    mov qword[result],0
+    rw 0, 0, n1, 17
+    call a_t_h
+    add qword[result],rbx
+    rw 0, 0, n2, 17
+    call a_t_h
+    add qword[result],rbx
+    mov rbx,[result]
+    rw 1, 1, m3, l3 
+    call h_t_a
+    ret
+	
+
+	
+mul_fun:
+    mov qword[result],0
+    rw 0, 0, n1, 17
+    call a_t_h
+    add qword[result],rbx
+    rw 0, 0, n2, 17
+    call a_t_h
+    add qword[result],rbx
+    mov rbx,[result]
+    rw 1, 1, m3, l3 
+    call h_t_a
+    ret
+	
+	
+	
+div_fun:
+    mov qword[result],0
+    rw 0, 0, n1, 17
+    call a_t_h
+    add qword[result],rbx
+    rw 0, 0, n2, 17
+    call a_t_h
+    add qword[result],rbx
+    mov rbx,[result]
+    rw 1, 1, m3, l3 
+    call h_t_a
+    ret
+	
+	
+a_t_h: 
+	mov rsi,n1
+	mov cx,16
+	xor rbx,rbx
+	mov rbx,rax
+	
+p1:
+	rol rbx,04
+	mov al,[rsi]
+	cmp al,46H
+	jg error
+	cmp al,39H
+	jbe p2
+	sub al,07H
+
+p2: 
+	sub al,30H
+	add al,bl
+	inc rsi
+	loop p1
+ret
+
+
+
+h_t_a: 
+	xor rbx,rbx
+	xor rax,rax
+	mov cx,16
+	mov rsi,result
+	
+Z1:
+	ROL rbx,04
+	mov AL,BL
+	AND AL,0FH
+	CMP AL,09
+	jbe Z2
+	ADD AL,07
+Z2:
+	ADD Al,30H
+	mov [rsi],al
+	inc rsi
+	loop Z1
+
+
+
+rw 1,1,result,16
+ret
+	
+	
